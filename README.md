@@ -29,3 +29,18 @@ Units attack with psychic abilities
 Think Childhood's End themed
 Hex grid?
 
+
+# TODO
+
+Backend:
+    Figure out how Lambda Java functions work (how to get them to execute on api call)
+    Write hello world for serverless Lambda
+    setup database that contains connected users
+    figure out if websockets can work in a lambda serverless setup
+    write functions that add user to database when they connect to server, and remove them when they disconnect
+    get active users
+    post room
+    get rooms
+    connect clients in a room directly
+Frontend:
+Game:
