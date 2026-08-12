@@ -1,0 +1,26 @@
+<div class="login-container">
+  <div class="card login-card">
+    <div class="header">
+      <h1 class="brand-title">NEWTYPE</h1>
+      <p class="subtitle">TIME TRAVEL & TELEPORTATION TACTICS</p>
+    </div>
+
+    <form (ngSubmit)="onLogin()" class="login-form">
+      <div class="form-group">
+        <label for="username">COMMANDER CODENAME</label>
+        <input
+          type="text"
+          id="username"
+          [(ngModel)]="username"
+          name="username"
+          placeholder="Enter username..."
+          autocomplete="off"
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary login-btn">
+        ENTER NETWORK
+      </button>
+    </form>
+  </div>
+</div>
