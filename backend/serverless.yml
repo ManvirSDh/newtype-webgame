@@ -1,0 +1,91 @@
+service: newtype-backend
+
+provider:
+  name: aws
+  runtime: java17
+  stage: dev
+  region: ${env:AWS_REGION, 'us-east-1'}
+  environment:
+    CONNECTIONS_TABLE: ${self:service}-connections-${self:provider.stage}
+    LOBBIES_TABLE: ${self:service}-lobbies-${self:provider.stage}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:DeleteItem
+            - dynamodb:Scan
+            - dynamodb:Query
+          Resource:
+            - Fn::GetAtt: [ConnectionsTable, Arn]
+            - Fn::GetAtt: [LobbiesTable, Arn]
+        - Effect: Allow
+          Action:
+            - execute-api:ManageConnections
+          Resource: "arn:aws:execute-api:*:*:*"
+
+package:
+  artifact: target/newtype-backend-1.0-SNAPSHOT.jar
+
+functions:
+  # WebSocket Connect Handler
+  connectHandler:
+    handler: com.newtype.WebSocketHandler::handleConnect
+    events:
+      - websocket:
+          route: $connect
+
+  # WebSocket Disconnect Handler
+  disconnectHandler:
+    handler: com.newtype.WebSocketHandler::handleDisconnect
+    events:
+      - websocket:
+          route: $disconnect
+
+  # Fetch Active Lobbies & Users
+  getLobbiesHandler:
+    handler: com.newtype.LobbyHandler::getLobbies
+    events:
+      - websocket:
+          route: getLobbies
+      - httpApi:
+          path: /lobbies
+          method: get
+
+  # Post/Create Room Handler
+  createRoomHandler:
+    handler: com.newtype.LobbyHandler::createRoom
+    events:
+      - websocket:
+          route: createRoom
+      - httpApi:
+          path: /lobbies
+          method: post
+
+resources:
+  Resources:
+    ConnectionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.CONNECTIONS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: connectionId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: connectionId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    LobbiesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.LOBBIES_TABLE}
+        AttributeDefinitions:
+          - AttributeName: roomId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: roomId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
