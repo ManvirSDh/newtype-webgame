@@ -1,9 +1,86 @@
-<div class="game-page-container">
-  <div class="game-container">
-    <!-- 9:16 aspect ratio container with border -->
+<div class="game-page-layout">
+  <!-- Left Side Container (9:16 Aspect Ratio) -->
+  <div class="segment-container aspect-9-16 left-segment">
+    <div class="segment-header">
+      <h3>Lobby Controls</h3>
+    </div>
+    
+    <div class="segment-content">
+      <!-- Placeholder Controls -->
+      <div class="control-group">
+        <label>Game Speed (Placeholder):</label>
+        <select disabled>
+          <option>1.0x Normal</option>
+          <option>1.5x Fast</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>Match Type (Placeholder):</label>
+        <select disabled>
+          <option>Standard 1v1</option>
+          <option>Custom Rules</option>
+        </select>
+      </div>
+
+      <hr />
+
+      <!-- Users in Game -->
+      <div class="users-section">
+        <h4>Users in Game</h4>
+        <ul class="users-list">
+          <li *ngFor="let user of usersList">
+            <span class="user-bullet">•</span> {{ user }}
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="segment-footer">
+      <button class="btn-disconnect" (click)="disconnectGame()">Disconnect</button>
+    </div>
+  </div>
+
+  <!-- Center Container (Game Screen, 9:16 Aspect Ratio) -->
+  <div class="segment-container aspect-9-16 center-segment">
     <div class="p2p-status-bar">
       <span>Role: <strong>{{ role | uppercase }}</strong></span>
       <span>P2P Status: <strong [class.connected]="p2pStatus === 'CONNECTED'">{{ p2pStatus }}</strong></span>
+    </div>
+    <div class="game-canvas-placeholder">
+      <p>Game Canvas Container (9:16)</p>
+    </div>
+  </div>
+
+  <!-- Right Side Container (Chat App, 9:16 Aspect Ratio) -->
+  <div class="segment-container aspect-9-16 right-segment">
+    <div class="segment-header">
+      <h3>Match Chat</h3>
+    </div>
+
+    <div class="chat-messages-container">
+      <div *ngIf="chatMessages.length === 0" class="no-messages">
+        <p>P2P connected! Send a message to chat.</p>
+      </div>
+
+      <div *ngFor="let msg of chatMessages" class="chat-bubble" [class.self]="msg.isSelf">
+        <div class="msg-meta">
+          <span class="msg-sender">{{ msg.sender }}</span>
+          <span class="msg-time">{{ msg.timestamp }}</span>
+        </div>
+        <div class="msg-text">{{ msg.text }}</div>
+      </div>
+    </div>
+
+    <div class="chat-input-row">
+      <input 
+        type="text" 
+        [(ngModel)]="newMessage" 
+        (keyup.enter)="sendMessage()" 
+        placeholder="Type a message..." 
+        [disabled]="p2pStatus !== 'CONNECTED'"
+      />
+      <button (click)="sendMessage()" [disabled]="p2pStatus !== 'CONNECTED'">Send</button>
     </div>
   </div>
 </div>

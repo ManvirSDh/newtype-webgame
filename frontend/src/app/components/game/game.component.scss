@@ -1,37 +1,229 @@
-.game-page-container {
+.game-page-layout {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 1.5rem;
   min-height: 100vh;
   padding: 1rem;
   box-sizing: border-box;
+  background: #f4f5f7;
 }
 
-.game-container {
-  aspect-ratio: 9 / 16;
-  height: 80vh;
-  max-width: 100%;
+.segment-container {
   border: 2px solid #333;
   border-radius: 8px;
   box-sizing: border-box;
-  background: #fdfdfd;
+  background: #ffffff;
   display: flex;
   flex-direction: column;
+
+  &.aspect-9-16 {
+    aspect-ratio: 9 / 16;
+    height: 80vh;
+    max-height: 800px;
+  }
 }
 
-.p2p-status-bar {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.75rem;
-  border-bottom: 1px solid #eee;
-  background: #f5f5f5;
+.segment-header {
+  padding: 0.75rem;
+  border-bottom: 1px solid #ddd;
+  background: #eaeaea;
 
-  strong {
-    color: #e65100;
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+    text-align: center;
+  }
+}
 
-    &.connected {
-      color: #2e7d32;
+/* Left Segment Styles */
+.left-segment {
+  .segment-content {
+    flex: 1;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+  }
+
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    label {
+      font-size: 0.8rem;
+      color: #555;
+    }
+
+    select {
+      padding: 0.4rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 0.5rem 0;
+  }
+
+  .users-section {
+    h4 {
+      margin: 0 0 0.5rem 0;
+      font-size: 0.9rem;
+    }
+
+    .users-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        padding: 0.3rem 0;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+
+        .user-bullet {
+          color: #2e7d32;
+        }
+      }
+    }
+  }
+
+  .segment-footer {
+    padding: 0.75rem;
+    border-top: 1px solid #ddd;
+    background: #fafafa;
+
+    .btn-disconnect {
+      width: 100%;
+      padding: 0.6rem;
+      background: #ffebee;
+      color: #c62828;
+      border: 1px solid #ffcdd2;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover {
+        background: #ffcdd2;
+      }
+    }
+  }
+}
+
+/* Center Segment Styles */
+.center-segment {
+  .p2p-status-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    border-bottom: 1px solid #eee;
+    background: #f5f5f5;
+
+    strong {
+      color: #e65100;
+
+      &.connected {
+        color: #2e7d32;
+      }
+    }
+  }
+
+  .game-canvas-placeholder {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #888;
+    font-size: 0.9rem;
+  }
+}
+
+/* Right Segment (Chat) Styles */
+.right-segment {
+  .chat-messages-container {
+    flex: 1;
+    padding: 0.75rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .no-messages {
+    text-align: center;
+    color: #888;
+    font-size: 0.8rem;
+    margin-top: 2rem;
+  }
+
+  .chat-bubble {
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    background: #f0f0f0;
+    max-width: 85%;
+    align-self: flex-start;
+
+    &.self {
+      align-self: flex-end;
+      background: #e3f2fd;
+    }
+
+    .msg-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-size: 0.7rem;
+      color: #666;
+      margin-bottom: 0.2rem;
+
+      .msg-sender {
+        font-weight: bold;
+      }
+    }
+
+    .msg-text {
+      font-size: 0.85rem;
+      word-break: break-word;
+    }
+  }
+
+  .chat-input-row {
+    display: flex;
+    padding: 0.5rem;
+    gap: 0.4rem;
+    border-top: 1px solid #ddd;
+    background: #fafafa;
+
+    input {
+      flex: 1;
+      padding: 0.4rem 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+
+    button {
+      padding: 0.4rem 0.75rem;
+      background: #e0e0e0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        background: #d0d0d0;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
     }
   }
 }
