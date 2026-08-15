@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -44,7 +44,8 @@ export class GameComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private webrtcService: WebRtcService,
-    private wsService: WebSocketService
+    private wsService: WebSocketService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -53,6 +54,7 @@ export class GameComponent implements OnInit, OnDestroy {
     this.route.queryParams.subscribe(params => {
       this.role = params['role'] || 'spectator';
       this.targetConnectionId = params['target'] || null;
+      const hostUsername = params['hostUsername'] || 'Host Pilot';
 
       if (this.role === 'host') {
         if (this.targetConnectionId) {
@@ -64,7 +66,8 @@ export class GameComponent implements OnInit, OnDestroy {
       } else if (this.role === 'guest') {
         if (this.targetConnectionId) {
           this.webrtcService.initializePeer(this.targetConnectionId, false);
-          this.statusText = 'Connecting to host...';
+          this.statusText = `Connecting to ${hostUsername}...`;
+          this.usersList = [this.currentUsername, hostUsername];
         }
       }
     });
@@ -76,6 +79,7 @@ export class GameComponent implements OnInit, OnDestroy {
         const guestName = message.guestUsername || 'Guest Pilot';
         this.usersList = [this.currentUsername, guestName];
         this.statusText = `Player ${guestName} joined! Establishing P2P link...`;
+        this.cdr.detectChanges();
         
         // Host initializes WebRTC offer to guest
         if (this.targetConnectionId) {
@@ -83,11 +87,6 @@ export class GameComponent implements OnInit, OnDestroy {
         }
       }
     });
-
-    // Default users list if not waiting as host
-    if (this.targetConnectionId && this.usersList.length < 2) {
-      this.usersList = [this.currentUsername, 'Opponent (P2P Client)'];
-    }
 
     // Listen for WebRTC Connection State
     this.stateSub = this.webrtcService.connectionState$.subscribe(state => {
@@ -102,6 +101,7 @@ export class GameComponent implements OnInit, OnDestroy {
       } else if (state === 'CLOSED' || state === 'FAILED') {
         this.statusText = 'P2P Connection Closed / Failed';
       }
+      this.cdr.detectChanges();
     });
 
     // Listen for incoming P2P Messages (Chat)
@@ -113,6 +113,14 @@ export class GameComponent implements OnInit, OnDestroy {
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           isSelf: false
         });
+
+        // Update partner username in user list if sent in chat metadata
+        if (msg.sender && this.usersList.length >= 2) {
+          this.usersList = [this.currentUsername, msg.sender];
+        }
+
+        // Trigger Angular change detection so chat bubble updates immediately!
+        this.cdr.detectChanges();
       }
     });
   }
@@ -139,6 +147,7 @@ export class GameComponent implements OnInit, OnDestroy {
     });
 
     this.newMessage = '';
+    this.cdr.detectChanges();
   }
 
   disconnectGame(): void {

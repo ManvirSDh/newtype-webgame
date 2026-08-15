@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -35,7 +35,8 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
-    private wsService: WebSocketService
+    private wsService: WebSocketService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -47,8 +48,10 @@ export class LobbyComponent implements OnInit, OnDestroy {
     this.wsSubscription = this.wsService.messages$.subscribe(message => {
       if (message.action === 'LOBBY_LIST') {
         this.lobbies = message.lobbies || [];
+        this.cdr.detectChanges();
       } else if (message.action === 'USER_LIST') {
         this.onlineUsers = message.users || [];
+        this.cdr.detectChanges();
       } else if (message.action === 'LOBBY_CREATED') {
         // Automatically navigate host into game page immediately upon creation
         this.router.navigate(['/game'], {
@@ -64,6 +67,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
           queryParams: {
             role: 'guest',
             target: message.hostConnectionId,
+            hostUsername: message.hostUsername,
             roomId: message.roomId
           }
         });

@@ -138,6 +138,7 @@ public class LobbyHandler {
             if (getItem.hasItem()) {
                 Map<String, AttributeValue> item = getItem.item();
                 String hostConnectionId = item.get("hostConnectionId").s();
+                String hostUsername = item.containsKey("hostUsername") ? item.get("hostUsername").s() : "Host Pilot";
 
                 Map<String, AttributeValueUpdate> updates = new HashMap<>();
                 updates.put("guestConnectionId", AttributeValueUpdate.builder()
@@ -178,6 +179,7 @@ public class LobbyHandler {
                 Map<String, Object> notifyGuest = new HashMap<>();
                 notifyGuest.put("action", "JOINED_LOBBY");
                 notifyGuest.put("hostConnectionId", hostConnectionId);
+                notifyGuest.put("hostUsername", hostUsername);
                 notifyGuest.put("roomId", roomId);
 
                 client.postToConnection(PostToConnectionRequest.builder()
