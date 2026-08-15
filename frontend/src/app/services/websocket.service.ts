@@ -13,10 +13,7 @@ export class WebSocketService {
   public messages$: Observable<any> = this.messagesSubject.asObservable();
   public isConnected$: Observable<boolean> = this.connectionStatusSubject.asObservable();
 
-  constructor() {
-    // Explicitly deferred: Do not auto-connect on instantiation.
-    // Call connect() when entering Lobby or needing matchmaking/signaling.
-  }
+  constructor() {}
 
   public connect(): void {
     if (this.socket && (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)) {
@@ -28,6 +25,11 @@ export class WebSocketService {
     this.socket.onopen = () => {
       console.log('Connected to API Gateway WebSocket');
       this.connectionStatusSubject.next(true);
+
+      const username = localStorage.getItem('username');
+      if (username) {
+        this.registerUser(username);
+      }
       this.getLobbies();
     };
 
@@ -49,6 +51,10 @@ export class WebSocketService {
     this.socket.onerror = (error) => {
       console.error('WebSocket Error:', error);
     };
+  }
+
+  public registerUser(username: string): void {
+    this.send('registerUser', { username });
   }
 
   public disconnect(): void {

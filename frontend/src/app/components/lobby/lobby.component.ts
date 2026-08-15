@@ -13,6 +13,11 @@ interface Lobby {
   status: string;
 }
 
+interface OnlineUser {
+  connectionId: string;
+  username: string;
+}
+
 @Component({
   selector: 'app-lobby',
   standalone: true,
@@ -24,6 +29,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
   newRoomName: string = '';
   currentUsername: string = '';
   lobbies: Lobby[] = [];
+  onlineUsers: OnlineUser[] = [];
   
   private wsSubscription!: Subscription;
 
@@ -41,6 +47,8 @@ export class LobbyComponent implements OnInit, OnDestroy {
     this.wsSubscription = this.wsService.messages$.subscribe(message => {
       if (message.action === 'LOBBY_LIST') {
         this.lobbies = message.lobbies || [];
+      } else if (message.action === 'USER_LIST') {
+        this.onlineUsers = message.users || [];
       } else if (message.action === 'PLAYER_JOINED') {
         this.router.navigate(['/game'], {
           queryParams: {

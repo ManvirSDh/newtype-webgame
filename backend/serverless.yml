@@ -4,7 +4,7 @@ provider:
   name: aws
   runtime: java17
   stage: dev
-  region: ${env:AWS_REGION, 'us-east-1'}
+  region: ${env:AWS_REGION, 'ca-central-1'}
   environment:
     CONNECTIONS_TABLE: ${self:service}-connections-${self:provider.stage}
     LOBBIES_TABLE: ${self:service}-lobbies-${self:provider.stage}
@@ -42,6 +42,12 @@ functions:
     events:
       - websocket:
           route: $disconnect
+
+  registerUserHandler:
+    handler: com.newtype.LobbyHandler::registerUser
+    events:
+      - websocket:
+          route: registerUser
 
   getLobbiesHandler:
     handler: com.newtype.LobbyHandler::getLobbies

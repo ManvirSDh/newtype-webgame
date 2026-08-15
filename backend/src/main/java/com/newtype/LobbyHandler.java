@@ -23,6 +23,43 @@ public class LobbyHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    public APIGatewayV2WebSocketResponse registerUser(APIGatewayV2WebSocketEvent event, Context context) {
+        String connectionId = event.getRequestContext().getConnectionId();
+        String domainName = event.getRequestContext().getDomainName();
+        String stage = event.getRequestContext().getStage();
+
+        try {
+            JsonNode body = objectMapper.readTree(event.getBody());
+            String username = body.path("username").asText("Pilot");
+            String tableName = System.getenv("CONNECTIONS_TABLE");
+
+            if (tableName != null) {
+                Map<String, AttributeValueUpdate> updates = new HashMap<>();
+                updates.put("username", AttributeValueUpdate.builder()
+                        .value(AttributeValue.builder().s(username).build())
+                        .action(AttributeAction.PUT)
+                        .build());
+
+                Map<String, AttributeValue> key = new HashMap<>();
+                key.put("connectionId", AttributeValue.builder().s(connectionId).build());
+
+                dynamoDb.updateItem(UpdateItemRequest.builder()
+                        .tableName(tableName)
+                        .key(key)
+                        .attributeUpdates(updates)
+                        .build());
+
+                broadcastUserList(domainName, stage, context);
+            }
+        } catch (Exception e) {
+            context.getLogger().log("Error in registerUser: " + e.getMessage());
+        }
+
+        APIGatewayV2WebSocketResponse response = new APIGatewayV2WebSocketResponse();
+        response.setStatusCode(200);
+        return response;
+    }
+
     public APIGatewayV2WebSocketResponse createLobby(APIGatewayV2WebSocketEvent event, Context context) {
         String connectionId = event.getRequestContext().getConnectionId();
         String domainName = event.getRequestContext().getDomainName();
@@ -180,6 +217,7 @@ public class LobbyHandler {
 
         try {
             sendLobbiesToConnection(connectionId, domainName, stage, context);
+            broadcastUserList(domainName, stage, context);
         } catch (Exception e) {
             context.getLogger().log("Error in getLobbies: " + e.getMessage());
         }
@@ -187,6 +225,49 @@ public class LobbyHandler {
         APIGatewayV2WebSocketResponse response = new APIGatewayV2WebSocketResponse();
         response.setStatusCode(200);
         return response;
+    }
+
+    private void broadcastUserList(String domainName, String stage, Context context) {
+        String connTableName = System.getenv("CONNECTIONS_TABLE");
+        if (connTableName == null) return;
+
+        try {
+            ScanResponse connScan = dynamoDb.scan(ScanRequest.builder().tableName(connTableName).build());
+            List<Map<String, String>> users = new ArrayList<>();
+            for (Map<String, AttributeValue> item : connScan.items()) {
+                Map<String, String> user = new HashMap<>();
+                String connId = item.get("connectionId").s();
+                String username = item.containsKey("username") ? item.get("username").s() : "Pilot (" + connId.substring(0, 6) + ")";
+                user.put("connectionId", connId);
+                user.put("username", username);
+                users.add(user);
+            }
+
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("action", "USER_LIST");
+            payload.put("users", users);
+
+            byte[] messageBytes = objectMapper.writeValueAsString(payload).getBytes();
+            URI endpoint = new URI("https://" + domainName + "/" + stage);
+            ApiGatewayManagementApiClient client = ApiGatewayManagementApiClient.builder()
+                    .endpointOverride(endpoint)
+                    .region(Region.US_EAST_1)
+                    .build();
+
+            for (Map<String, AttributeValue> item : connScan.items()) {
+                String connId = item.get("connectionId").s();
+                try {
+                    client.postToConnection(PostToConnectionRequest.builder()
+                            .connectionId(connId)
+                            .data(SdkBytes.fromByteArray(messageBytes))
+                            .build());
+                } catch (Exception e) {
+                    // Ignore stale socket post failures
+                }
+            }
+        } catch (Exception e) {
+            context.getLogger().log("Error broadcasting user list: " + e.getMessage());
+        }
     }
 
     private void broadcastLobbyList(String domainName, String stage, Context context) {

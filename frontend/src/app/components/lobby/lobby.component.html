@@ -1,54 +1,77 @@
-<div class="lobby-container">
-  <!-- Projects / Active Lobbies List Container -->
-  <div class="section projects-container">
-    <h2>Active Lobbies</h2>
-    
-    <div *ngIf="lobbies.length === 0" class="placeholder-box">
-      <p>No active lobbies found. Create one below to get started.</p>
-    </div>
+<div class="lobby-layout">
+  <!-- Main Lobby Section (Active Lobbies & Create Lobby) -->
+  <div class="main-content">
+    <!-- Active Lobbies List Container -->
+    <div class="section projects-container">
+      <h2>Active Lobbies</h2>
+      
+      <div *ngIf="lobbies.length === 0" class="placeholder-box">
+        <p>No active lobbies found. Create one below to get started.</p>
+      </div>
 
-    <div *ngIf="lobbies.length > 0" class="lobby-list">
-      <div *ngFor="let lobby of lobbies" class="lobby-item">
-        <div class="lobby-info">
-          <strong>{{ lobby.roomName }}</strong>
-          <span class="host-tag">Host: {{ lobby.hostUsername }}</span>
-          <span class="status-badge" [class.open]="lobby.status === 'OPEN'">{{ lobby.status }}</span>
-        </div>
-        <div class="lobby-actions">
-          <button 
-            *ngIf="lobby.status === 'OPEN'" 
-            class="btn" 
-            (click)="joinLobby(lobby.roomId)"
-          >
-            Join
-          </button>
-          <button 
-            class="btn btn-close" 
-            (click)="closeLobby(lobby.roomId)"
-          >
-            Close
-          </button>
+      <div *ngIf="lobbies.length > 0" class="lobby-list">
+        <div *ngFor="let lobby of lobbies" class="lobby-item">
+          <div class="lobby-info">
+            <strong>{{ lobby.roomName }}</strong>
+            <span class="host-tag">Host: {{ lobby.hostUsername }}</span>
+            <span class="status-badge" [class.open]="lobby.status === 'OPEN'">{{ lobby.status }}</span>
+          </div>
+          <div class="lobby-actions">
+            <button 
+              *ngIf="lobby.status === 'OPEN'" 
+              class="btn" 
+              (click)="joinLobby(lobby.roomId)"
+            >
+              Join
+            </button>
+            <button 
+              class="btn btn-close" 
+              (click)="closeLobby(lobby.roomId)"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- Create Lobby Section -->
+    <div class="section create-lobby-container">
+      <h2>Create Lobby</h2>
+      <div class="form-group">
+        <label>Lobby Name:</label>
+        <input type="text" [(ngModel)]="newRoomName" placeholder="Enter lobby name..." />
+      </div>
+
+      <div class="form-group">
+        <label>Mode (Placeholder):</label>
+        <select>
+          <option>1v1 Blitz Mode</option>
+          <option>Tetris Time Race</option>
+        </select>
+      </div>
+
+      <button class="btn" (click)="createRoom()">Create Lobby</button>
+    </div>
   </div>
 
-  <!-- Create Lobby Section -->
-  <div class="section create-lobby-container">
-    <h2>Create Lobby</h2>
-    <div class="form-group">
-      <label>Lobby Name:</label>
-      <input type="text" [(ngModel)]="newRoomName" placeholder="Enter lobby name..." />
+  <!-- Sidebar (Right) - Online Connected Users List -->
+  <div class="sidebar users-sidebar">
+    <div class="sidebar-header">
+      <h3>Connected Pilots</h3>
+      <span class="user-count">{{ onlineUsers.length }} Online</span>
     </div>
 
-    <div class="form-group">
-      <label>Mode (Placeholder):</label>
-      <select>
-        <option>1v1 Blitz Mode</option>
-        <option>Tetris Time Race</option>
-      </select>
+    <div *ngIf="onlineUsers.length === 0" class="no-users">
+      <p>Connecting to server...</p>
     </div>
 
-    <button class="btn" (click)="createRoom()">Create Lobby</button>
+    <ul *ngIf="onlineUsers.length > 0" class="online-users-list">
+      <li *ngFor="let user of onlineUsers" class="user-item">
+        <span class="online-indicator"></span>
+        <span class="username">{{ user.username }}</span>
+        <span *ngIf="user.username === currentUsername" class="you-badge">(You)</span>
+      </li>
+    </ul>
   </div>
 </div>
