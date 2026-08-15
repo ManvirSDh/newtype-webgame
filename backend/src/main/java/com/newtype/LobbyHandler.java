@@ -17,8 +17,10 @@ import java.util.*;
 
 public class LobbyHandler {
 
+    private final Region currentRegion = Region.of(System.getenv("AWS_REGION") != null ? System.getenv("AWS_REGION") : "ca-central-1");
+
     private final DynamoDbClient dynamoDb = DynamoDbClient.builder()
-            .region(Region.US_EAST_1)
+            .region(currentRegion)
             .build();
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -121,7 +123,6 @@ public class LobbyHandler {
                 Map<String, AttributeValue> item = getItem.item();
                 String hostConnectionId = item.get("hostConnectionId").s();
 
-                // Update room to FULL
                 Map<String, AttributeValueUpdate> updates = new HashMap<>();
                 updates.put("guestConnectionId", AttributeValueUpdate.builder()
                         .value(AttributeValue.builder().s(connectionId).build())
@@ -142,11 +143,10 @@ public class LobbyHandler {
                         .attributeUpdates(updates)
                         .build());
 
-                // Notify host that player joined
                 URI endpoint = new URI("https://" + domainName + "/" + stage);
                 ApiGatewayManagementApiClient client = ApiGatewayManagementApiClient.builder()
                         .endpointOverride(endpoint)
-                        .region(Region.US_EAST_1)
+                        .region(currentRegion)
                         .build();
 
                 Map<String, Object> notifyHost = new HashMap<>();
@@ -159,7 +159,6 @@ public class LobbyHandler {
                         .data(SdkBytes.fromByteArray(objectMapper.writeValueAsString(notifyHost).getBytes()))
                         .build());
 
-                // Notify guest of success
                 Map<String, Object> notifyGuest = new HashMap<>();
                 notifyGuest.put("action", "JOINED_LOBBY");
                 notifyGuest.put("hostConnectionId", hostConnectionId);
@@ -251,7 +250,7 @@ public class LobbyHandler {
             URI endpoint = new URI("https://" + domainName + "/" + stage);
             ApiGatewayManagementApiClient client = ApiGatewayManagementApiClient.builder()
                     .endpointOverride(endpoint)
-                    .region(Region.US_EAST_1)
+                    .region(currentRegion)
                     .build();
 
             for (Map<String, AttributeValue> item : connScan.items()) {
@@ -307,7 +306,7 @@ public class LobbyHandler {
         URI endpoint = new URI("https://" + domainName + "/" + stage);
         ApiGatewayManagementApiClient client = ApiGatewayManagementApiClient.builder()
                 .endpointOverride(endpoint)
-                .region(Region.US_EAST_1)
+                .region(currentRegion)
                 .build();
 
         client.postToConnection(PostToConnectionRequest.builder()

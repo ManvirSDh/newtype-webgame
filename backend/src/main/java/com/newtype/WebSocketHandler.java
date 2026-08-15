@@ -16,8 +16,10 @@ import java.util.*;
 
 public class WebSocketHandler {
 
+    private final Region currentRegion = Region.of(System.getenv("AWS_REGION") != null ? System.getenv("AWS_REGION") : "ca-central-1");
+
     private final DynamoDbClient dynamoDb = DynamoDbClient.builder()
-            .region(Region.US_EAST_1)
+            .region(currentRegion)
             .build();
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -41,7 +43,6 @@ public class WebSocketHandler {
                     .build());
         }
 
-        // Broadcast updated user list to all connected clients
         if (domainName != null && stage != null) {
             broadcastUserList(domainName, stage, context);
         }
@@ -58,7 +59,6 @@ public class WebSocketHandler {
         String stage = event.getRequestContext().getStage();
         context.getLogger().log("WebSocket client disconnected: " + connectionId);
 
-        // 1. Remove connection from ConnectionsTable
         String connTableName = System.getenv("CONNECTIONS_TABLE");
         if (connTableName != null) {
             Map<String, AttributeValue> key = new HashMap<>();
@@ -70,7 +70,6 @@ public class WebSocketHandler {
                     .build());
         }
 
-        // 2. Scan and remove any lobbies associated with this connection (host or guest)
         String lobbiesTableName = System.getenv("LOBBIES_TABLE");
         if (lobbiesTableName != null) {
             try {
@@ -105,7 +104,6 @@ public class WebSocketHandler {
             }
         }
 
-        // Broadcast updated user list to all remaining connected clients
         if (domainName != null && stage != null) {
             broadcastUserList(domainName, stage, context);
         }
@@ -140,7 +138,7 @@ public class WebSocketHandler {
             URI endpoint = new URI("https://" + domainName + "/" + stage);
             ApiGatewayManagementApiClient client = ApiGatewayManagementApiClient.builder()
                     .endpointOverride(endpoint)
-                    .region(Region.US_EAST_1)
+                    .region(currentRegion)
                     .build();
 
             for (Map<String, AttributeValue> item : connScan.items()) {
@@ -185,7 +183,7 @@ public class WebSocketHandler {
             URI endpoint = new URI("https://" + domainName + "/" + stage);
             ApiGatewayManagementApiClient client = ApiGatewayManagementApiClient.builder()
                     .endpointOverride(endpoint)
-                    .region(Region.US_EAST_1)
+                    .region(currentRegion)
                     .build();
 
             ScanResponse connScan = dynamoDb.scan(ScanRequest.builder().tableName(connTableName).build());

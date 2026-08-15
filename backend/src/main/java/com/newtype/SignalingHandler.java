@@ -16,6 +16,8 @@ import java.util.Map;
 
 public class SignalingHandler {
 
+    private final Region currentRegion = Region.of(System.getenv("AWS_REGION") != null ? System.getenv("AWS_REGION") : "ca-central-1");
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public APIGatewayV2WebSocketResponse sendSignal(APIGatewayV2WebSocketEvent event, Context context) {
@@ -33,7 +35,7 @@ public class SignalingHandler {
             URI endpoint = new URI("https://" + domainName + "/" + stage);
             ApiGatewayManagementApiClient client = ApiGatewayManagementApiClient.builder()
                     .endpointOverride(endpoint)
-                    .region(Region.US_EAST_1)
+                    .region(currentRegion)
                     .build();
 
             Map<String, Object> payload = new HashMap<>();
