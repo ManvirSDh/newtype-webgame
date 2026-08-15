@@ -1,25 +1,25 @@
 <div class="game-page-layout">
-  <!-- Left Side Container (9:16 Aspect Ratio) -->
+  <!-- Left Side Container -->
   <div class="segment-container aspect-9-16 left-segment">
     <div class="segment-header">
       <h3>Lobby Controls</h3>
     </div>
-    
+
     <div class="segment-content">
       <!-- Placeholder Controls -->
       <div class="control-group">
-        <label>Game Speed (Placeholder):</label>
+        <label>Option A:</label>
         <select disabled>
-          <option>1.0x Normal</option>
-          <option>1.5x Fast</option>
+          <option>PLACEHOLDER</option>
+          <option>PLACEHOLDER</option>
         </select>
       </div>
 
       <div class="control-group">
-        <label>Match Type (Placeholder):</label>
+        <label>Option B:</label>
         <select disabled>
-          <option>Standard 1v1</option>
-          <option>Custom Rules</option>
+          <option>PLACEHOLDER</option>
+          <option>PLACEHOLDER</option>
         </select>
       </div>
 
@@ -41,7 +41,7 @@
     </div>
   </div>
 
-  <!-- Center Container (Game Screen, 9:16 Aspect Ratio) -->
+  <!-- Center Container -->
   <div class="segment-container aspect-9-16 center-segment">
     <div class="p2p-status-bar">
       <span>Role: <strong>{{ role | uppercase }}</strong></span>
@@ -55,7 +55,7 @@
     </div>
   </div>
 
-  <!-- Right Side Container (Chat App, 9:16 Aspect Ratio) -->
+  <!-- Right Side Container -->
   <div class="segment-container aspect-9-16 right-segment">
     <div class="segment-header">
       <h3>Match Chat</h3>
@@ -77,11 +77,11 @@
     </div>
 
     <div class="chat-input-row">
-      <input 
-        type="text" 
-        [(ngModel)]="newMessage" 
-        (keyup.enter)="sendMessage()" 
-        placeholder="Type a message..." 
+      <input
+        type="text"
+        [(ngModel)]="newMessage"
+        (keyup.enter)="sendMessage()"
+        placeholder="Type a message..."
         [disabled]="p2pStatus !== 'CONNECTED'"
       />
       <button (click)="sendMessage()" [disabled]="p2pStatus !== 'CONNECTED'">Send</button>

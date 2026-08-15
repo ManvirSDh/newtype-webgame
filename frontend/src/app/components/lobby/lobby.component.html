@@ -4,7 +4,7 @@
     <!-- Active Lobbies List Container -->
     <div class="section projects-container">
       <h2>Active Lobbies</h2>
-      
+
       <div *ngIf="lobbies.length === 0" class="placeholder-box">
         <p>No active lobbies found. Create one below to get started.</p>
       </div>
@@ -17,15 +17,15 @@
             <span class="status-badge" [class.open]="lobby.status === 'OPEN'">{{ lobby.status }}</span>
           </div>
           <div class="lobby-actions">
-            <button 
-              *ngIf="lobby.status === 'OPEN'" 
-              class="btn" 
+            <button
+              *ngIf="lobby.status === 'OPEN'"
+              class="btn"
               (click)="joinLobby(lobby.roomId)"
             >
               Join
             </button>
-            <button 
-              class="btn btn-close" 
+            <button
+              class="btn btn-close"
               (click)="closeLobby(lobby.roomId)"
             >
               Close
@@ -44,10 +44,10 @@
       </div>
 
       <div class="form-group">
-        <label>Mode (Placeholder):</label>
+        <label>Option A:</label>
         <select>
-          <option>1v1 Blitz Mode</option>
-          <option>Tetris Time Race</option>
+          <option>PLACEHOLDER</option>
+          <option>PLACEHOLDER</option>
         </select>
       </div>
 
