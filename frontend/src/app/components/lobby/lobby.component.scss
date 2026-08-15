@@ -25,6 +25,48 @@
   color: #666;
 }
 
+.lobby-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.lobby-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  background: #fafafa;
+
+  .lobby-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+
+    .host-tag {
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    .status-badge {
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: #e65100;
+
+      &.open {
+        color: #2e7d32;
+      }
+    }
+  }
+
+  .lobby-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
 .create-lobby-container {
   display: flex;
   flex-direction: column;
@@ -52,6 +94,12 @@
 
     &:hover {
       background: #e0e0e0;
+    }
+
+    &.btn-close {
+      background: #ffebee;
+      color: #c62828;
+      border-color: #ffcdd2;
     }
   }
 }

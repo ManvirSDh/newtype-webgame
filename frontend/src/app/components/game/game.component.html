@@ -1,5 +1,9 @@
 <div class="game-page-container">
   <div class="game-container">
     <!-- 9:16 aspect ratio container with border -->
+    <div class="p2p-status-bar">
+      <span>Role: <strong>{{ role | uppercase }}</strong></span>
+      <span>P2P Status: <strong [class.connected]="p2pStatus === 'CONNECTED'">{{ p2pStatus }}</strong></span>
+    </div>
   </div>
 </div>

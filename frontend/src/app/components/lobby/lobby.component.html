@@ -1,9 +1,35 @@
 <div class="lobby-container">
-  <!-- Projects List Container -->
+  <!-- Projects / Active Lobbies List Container -->
   <div class="section projects-container">
-    <h2>Projects</h2>
-    <div class="placeholder-box">
-      <p>No projects yet (Placeholder)</p>
+    <h2>Active Lobbies</h2>
+    
+    <div *ngIf="lobbies.length === 0" class="placeholder-box">
+      <p>No active lobbies found. Create one below to get started.</p>
+    </div>
+
+    <div *ngIf="lobbies.length > 0" class="lobby-list">
+      <div *ngFor="let lobby of lobbies" class="lobby-item">
+        <div class="lobby-info">
+          <strong>{{ lobby.roomName }}</strong>
+          <span class="host-tag">Host: {{ lobby.hostUsername }}</span>
+          <span class="status-badge" [class.open]="lobby.status === 'OPEN'">{{ lobby.status }}</span>
+        </div>
+        <div class="lobby-actions">
+          <button 
+            *ngIf="lobby.status === 'OPEN'" 
+            class="btn" 
+            (click)="joinLobby(lobby.roomId)"
+          >
+            Join
+          </button>
+          <button 
+            class="btn btn-close" 
+            (click)="closeLobby(lobby.roomId)"
+          >
+            Close
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -16,13 +42,13 @@
     </div>
 
     <div class="form-group">
-      <label>Options (Placeholder):</label>
+      <label>Mode (Placeholder):</label>
       <select>
-        <option>Placeholder Option 1</option>
-        <option>Placeholder Option 2</option>
+        <option>1v1 Blitz Mode</option>
+        <option>Tetris Time Race</option>
       </select>
     </div>
 
-    <button class="btn" (click)="createRoom()">Create</button>
+    <button class="btn" (click)="createRoom()">Create Lobby</button>
   </div>
 </div>

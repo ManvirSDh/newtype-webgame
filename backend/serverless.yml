@@ -15,6 +15,7 @@ provider:
           Action:
             - dynamodb:PutItem
             - dynamodb:GetItem
+            - dynamodb:UpdateItem
             - dynamodb:DeleteItem
             - dynamodb:Scan
             - dynamodb:Query
@@ -30,39 +31,47 @@ package:
   artifact: target/newtype-backend-1.0-SNAPSHOT.jar
 
 functions:
-  # WebSocket Connect Handler
   connectHandler:
     handler: com.newtype.WebSocketHandler::handleConnect
     events:
       - websocket:
           route: $connect
 
-  # WebSocket Disconnect Handler
   disconnectHandler:
     handler: com.newtype.WebSocketHandler::handleDisconnect
     events:
       - websocket:
           route: $disconnect
 
-  # Fetch Active Lobbies & Users
   getLobbiesHandler:
     handler: com.newtype.LobbyHandler::getLobbies
     events:
       - websocket:
           route: getLobbies
-      - httpApi:
-          path: /lobbies
-          method: get
 
-  # Post/Create Room Handler
-  createRoomHandler:
-    handler: com.newtype.LobbyHandler::createRoom
+  createLobbyHandler:
+    handler: com.newtype.LobbyHandler::createLobby
     events:
       - websocket:
-          route: createRoom
-      - httpApi:
-          path: /lobbies
-          method: post
+          route: createLobby
+
+  joinLobbyHandler:
+    handler: com.newtype.LobbyHandler::joinLobby
+    events:
+      - websocket:
+          route: joinLobby
+
+  closeLobbyHandler:
+    handler: com.newtype.LobbyHandler::closeLobby
+    events:
+      - websocket:
+          route: closeLobby
+
+  sendSignalHandler:
+    handler: com.newtype.SignalingHandler::sendSignal
+    events:
+      - websocket:
+          route: sendSignal
 
 resources:
   Resources:

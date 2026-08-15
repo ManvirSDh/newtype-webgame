@@ -15,4 +15,23 @@
   border-radius: 8px;
   box-sizing: border-box;
   background: #fdfdfd;
+  display: flex;
+  flex-direction: column;
+}
+
+.p2p-status-bar {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  border-bottom: 1px solid #eee;
+  background: #f5f5f5;
+
+  strong {
+    color: #e65100;
+
+    &.connected {
+      color: #2e7d32;
+    }
+  }
 }
