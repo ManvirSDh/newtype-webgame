@@ -26,6 +26,9 @@ export class GameComponent implements OnInit, OnDestroy {
   role: string = 'spectator';
   currentUsername: string = '';
 
+  // Status text overlay
+  statusText: string = 'Initializing match...';
+
   // Chat
   chatMessages: ChatMessage[] = [];
   newMessage: string = '';
@@ -35,6 +38,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
   private stateSub!: Subscription;
   private p2pSub!: Subscription;
+  private wsSub!: Subscription;
 
   constructor(
     private route: ActivatedRoute,
@@ -50,22 +54,53 @@ export class GameComponent implements OnInit, OnDestroy {
       this.role = params['role'] || 'spectator';
       this.targetConnectionId = params['target'] || null;
 
-      if (this.targetConnectionId) {
-        const isHost = this.role === 'host';
-        this.webrtcService.initializePeer(this.targetConnectionId, isHost);
+      if (this.role === 'host') {
+        if (this.targetConnectionId) {
+          this.webrtcService.initializePeer(this.targetConnectionId, true);
+        } else {
+          this.statusText = 'Waiting for second player...';
+          this.usersList = [this.currentUsername];
+        }
+      } else if (this.role === 'guest') {
+        if (this.targetConnectionId) {
+          this.webrtcService.initializePeer(this.targetConnectionId, false);
+          this.statusText = 'Connecting to host...';
+        }
       }
     });
 
-    // Populate user list
-    this.usersList = [this.currentUsername, 'Opponent (P2P Client)'];
+    // Listen to WebSocket while waiting in room as host for second player
+    this.wsSub = this.wsService.messages$.subscribe(message => {
+      if (message.action === 'PLAYER_JOINED') {
+        this.targetConnectionId = message.guestConnectionId;
+        const guestName = message.guestUsername || 'Guest Pilot';
+        this.usersList = [this.currentUsername, guestName];
+        this.statusText = `Player ${guestName} joined! Establishing P2P link...`;
+        
+        // Host initializes WebRTC offer to guest
+        if (this.targetConnectionId) {
+          this.webrtcService.initializePeer(this.targetConnectionId, true);
+        }
+      }
+    });
+
+    // Default users list if not waiting as host
+    if (this.targetConnectionId && this.usersList.length < 2) {
+      this.usersList = [this.currentUsername, 'Opponent (P2P Client)'];
+    }
 
     // Listen for WebRTC Connection State
     this.stateSub = this.webrtcService.connectionState$.subscribe(state => {
       this.p2pStatus = state;
 
       if (state === 'CONNECTED') {
+        this.statusText = 'P2P Connection Established!';
         console.log('Direct WebRTC P2P channel established. Closing signaling WebSocket.');
         this.wsService.disconnect();
+      } else if (state === 'CONNECTING') {
+        this.statusText = 'Establishing P2P Data Channel...';
+      } else if (state === 'CLOSED' || state === 'FAILED') {
+        this.statusText = 'P2P Connection Closed / Failed';
       }
     });
 
@@ -113,5 +148,6 @@ export class GameComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.stateSub) this.stateSub.unsubscribe();
     if (this.p2pSub) this.p2pSub.unsubscribe();
+    if (this.wsSub) this.wsSub.unsubscribe();
   }
 }

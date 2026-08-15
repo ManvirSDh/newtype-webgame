@@ -89,6 +89,22 @@ public class LobbyHandler {
                     .item(item)
                     .build());
 
+            // Send confirmation back to host so they can auto-join the game room
+            URI endpoint = new URI("https://" + domainName + "/" + stage);
+            ApiGatewayManagementApiClient client = ApiGatewayManagementApiClient.builder()
+                    .endpointOverride(endpoint)
+                    .region(currentRegion)
+                    .build();
+
+            Map<String, Object> notifyHost = new HashMap<>();
+            notifyHost.put("action", "LOBBY_CREATED");
+            notifyHost.put("roomId", roomId);
+
+            client.postToConnection(PostToConnectionRequest.builder()
+                    .connectionId(connectionId)
+                    .data(SdkBytes.fromByteArray(objectMapper.writeValueAsString(notifyHost).getBytes()))
+                    .build());
+
             broadcastLobbyList(domainName, stage, context);
 
         } catch (Exception e) {

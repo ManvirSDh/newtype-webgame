@@ -49,13 +49,16 @@ export class LobbyComponent implements OnInit, OnDestroy {
         this.lobbies = message.lobbies || [];
       } else if (message.action === 'USER_LIST') {
         this.onlineUsers = message.users || [];
-      } else if (message.action === 'PLAYER_JOINED') {
+      } else if (message.action === 'LOBBY_CREATED') {
+        // Automatically navigate host into game page immediately upon creation
         this.router.navigate(['/game'], {
           queryParams: {
             role: 'host',
-            target: message.guestConnectionId
+            roomId: message.roomId
           }
         });
+      } else if (message.action === 'PLAYER_JOINED') {
+        // Handled in GameComponent if host is already in /game
       } else if (message.action === 'JOINED_LOBBY') {
         this.router.navigate(['/game'], {
           queryParams: {

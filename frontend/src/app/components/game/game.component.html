@@ -48,7 +48,10 @@
       <span>P2P Status: <strong [class.connected]="p2pStatus === 'CONNECTED'">{{ p2pStatus }}</strong></span>
     </div>
     <div class="game-canvas-placeholder">
-      <p>Game Canvas Container (9:16)</p>
+      <p class="canvas-title">Game Canvas Container (9:16)</p>
+      <div class="status-banner" [class.waiting]="p2pStatus !== 'CONNECTED'">
+        {{ statusText }}
+      </div>
     </div>
   </div>
 
@@ -60,7 +63,8 @@
 
     <div class="chat-messages-container">
       <div *ngIf="chatMessages.length === 0" class="no-messages">
-        <p>P2P connected! Send a message to chat.</p>
+        <p *ngIf="p2pStatus === 'CONNECTED'">P2P connected! Send a message to chat.</p>
+        <p *ngIf="p2pStatus !== 'CONNECTED'">Chat will be enabled once P2P connects...</p>
       </div>
 
       <div *ngFor="let msg of chatMessages" class="chat-bubble" [class.self]="msg.isSelf">
