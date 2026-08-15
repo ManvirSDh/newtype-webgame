@@ -1,80 +1,28 @@
-<div class="lobby-layout">
-  <!-- Top Navbar -->
-  <header class="navbar">
-    <div class="nav-brand">
-      <span class="brand-title">NEWTYPE</span>
-      <span class="badge">LOBBY</span>
+<div class="lobby-container">
+  <!-- Projects List Container -->
+  <div class="section projects-container">
+    <h2>Projects</h2>
+    <div class="placeholder-box">
+      <p>No projects yet (Placeholder)</p>
     </div>
-    <div class="user-profile">
-      <span class="user-name">COMMANDER: <strong>{{ currentUsername }}</strong></span>
-      <button class="btn btn-secondary btn-sm" (click)="logout()">DISCONNECT</button>
+  </div>
+
+  <!-- Create Lobby Section -->
+  <div class="section create-lobby-container">
+    <h2>Create Lobby</h2>
+    <div class="form-group">
+      <label>Lobby Name:</label>
+      <input type="text" [(ngModel)]="newRoomName" placeholder="Enter lobby name..." />
     </div>
-  </header>
 
-  <div class="lobby-body">
-    <!-- Left Column: Create Room & Available Rooms -->
-    <main class="main-content">
-      <!-- Create Room Panel -->
-      <section class="card panel create-panel">
-        <h2 class="panel-title">HOST NEW SECTOR</h2>
-        <div class="create-form">
-          <input
-            type="text"
-            [(ngModel)]="newRoomName"
-            placeholder="Room Name / Title..."
-          />
-          <select [(ngModel)]="selectedMode">
-            <option value="1v1 Blitz">1v1 Blitz (Psychic Hex)</option>
-            <option value="Tetris-like Race">Tetris Time Race</option>
-          </select>
-          <button class="btn btn-primary" (click)="createRoom()">CREATE ROOM</button>
-        </div>
-      </section>
+    <div class="form-group">
+      <label>Options (Placeholder):</label>
+      <select>
+        <option>Placeholder Option 1</option>
+        <option>Placeholder Option 2</option>
+      </select>
+    </div>
 
-      <!-- Active Lobbies List -->
-      <section class="card panel rooms-panel">
-        <div class="panel-header">
-          <h2 class="panel-title">ACTIVE LOBBIES ({{ rooms.length }})</h2>
-          <button class="btn btn-primary btn-sm" (click)="quickMatch()">QUICK MATCH</button>
-        </div>
-
-        <div class="rooms-list">
-          <div *ngFor="let room of rooms" class="room-card card">
-            <div class="room-info">
-              <div class="room-title-row">
-                <span class="room-name">{{ room.name }}</span>
-                <span class="mode-tag">{{ room.mode }}</span>
-              </div>
-              <div class="room-meta">
-                <span>HOST: {{ room.host }}</span>
-                <span>PLAYERS: {{ room.players }}/{{ room.maxPlayers }}</span>
-                <span class="status" [class.open]="room.status === 'Open'">{{ room.status }}</span>
-              </div>
-            </div>
-            <div class="room-action">
-              <button
-                class="btn btn-primary"
-                [disabled]="room.status !== 'Open'"
-                (click)="joinRoom(room.id)"
-              >
-                JOIN
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- Right Column: Active Users -->
-    <aside class="sidebar card panel">
-      <h2 class="panel-title">CONNECTED PILOTS ({{ onlineUsers.length }})</h2>
-      <ul class="user-list">
-        <li *ngFor="let user of onlineUsers" class="user-item">
-          <span class="status-indicator" [ngClass]="user.status.toLowerCase().replace(' ', '-')"></span>
-          <span class="username">{{ user.username }}</span>
-          <span class="user-status">{{ user.status }}</span>
-        </li>
-      </ul>
-    </aside>
+    <button class="btn" (click)="createRoom()">Create</button>
   </div>
 </div>
