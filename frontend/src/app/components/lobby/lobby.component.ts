@@ -35,11 +35,13 @@ export class LobbyComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.currentUsername = localStorage.getItem('username') || 'Commander_' + Math.floor(100 + Math.random() * 900);
 
+    // Connect WebSocket when user enters Lobby
+    this.wsService.connect();
+
     this.wsSubscription = this.wsService.messages$.subscribe(message => {
       if (message.action === 'LOBBY_LIST') {
         this.lobbies = message.lobbies || [];
       } else if (message.action === 'PLAYER_JOINED') {
-        // As host, navigate to game with guest details
         this.router.navigate(['/game'], {
           queryParams: {
             role: 'host',
@@ -47,7 +49,6 @@ export class LobbyComponent implements OnInit, OnDestroy {
           }
         });
       } else if (message.action === 'JOINED_LOBBY') {
-        // As guest, navigate to game with host details
         this.router.navigate(['/game'], {
           queryParams: {
             role: 'guest',
@@ -57,8 +58,6 @@ export class LobbyComponent implements OnInit, OnDestroy {
         });
       }
     });
-
-    this.wsService.getLobbies();
   }
 
   createRoom(): void {

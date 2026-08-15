@@ -6,7 +6,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class WebSocketService {
-  private socket!: WebSocket;
+  private socket: WebSocket | null = null;
   private messagesSubject = new Subject<any>();
   private connectionStatusSubject = new BehaviorSubject<boolean>(false);
 
@@ -14,7 +14,8 @@ export class WebSocketService {
   public isConnected$: Observable<boolean> = this.connectionStatusSubject.asObservable();
 
   constructor() {
-    this.connect();
+    // Explicitly deferred: Do not auto-connect on instantiation.
+    // Call connect() when entering Lobby or needing matchmaking/signaling.
   }
 
   public connect(): void {
@@ -40,14 +41,22 @@ export class WebSocketService {
     };
 
     this.socket.onclose = () => {
-      console.warn('WebSocket connection closed. Reconnecting in 3s...');
+      console.log('WebSocket connection closed.');
       this.connectionStatusSubject.next(false);
-      setTimeout(() => this.connect(), 3000);
+      this.socket = null;
     };
 
     this.socket.onerror = (error) => {
       console.error('WebSocket Error:', error);
     };
+  }
+
+  public disconnect(): void {
+    if (this.socket) {
+      this.socket.close();
+      this.socket = null;
+      this.connectionStatusSubject.next(false);
+    }
   }
 
   public send(action: string, payload: any = {}): void {
