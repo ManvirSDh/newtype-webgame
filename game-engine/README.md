@@ -131,3 +131,64 @@ try to compile with tinyGo or compress with brotli (serve with https://github.co
                 - Very expensive
                 
 
+## IMPLEMENTATION PLANNING
+- Game Object:
+    - Grid Layout Object, 2D array of Cells <Cell[][]>
+    - Player Object <Player>
+    - Opponent Object <Player>
+    - Turn Count <int>
+- Cell Object:
+    - Is cell a resource area? <Bool>
+    - Pointer to unit that is inside. <Unit*>
+- Player Object:
+    - List of Units: <Unit[]>
+    - Resource Count: <int>
+    - Commander Type: <String>
+- Unit Object:
+    - Health: <int>
+    - Atk: <int>
+    - Def: <int>
+    - Walk_freq: <int>
+    - Type: <String>
+    - Pointer to Owner: <Player*>
+    - Position: <tuple(int, int)>
+
+    
+- LAYOUT
+- DRAWING
+    - Strip at top for game options (leave game, etc.)
+    - Main game screen
+        - Draw hex grid (regular tiles vs resource tile)
+        - Draw player units
+            - Draw sprites
+            - Draw health bar below sprite
+        - Draw any effects for animations or the like
+        - Draw any effects for window dressing
+    - Command strip at bottom
+        - Health bar
+        - Two buttons that say "Spawn Unit" or "Command Options"
+            - If you click spawn unit, will replace with cards with the available units to spawn
+            - If you click command options, will replace with cards with the available command options
+            - If you click on a unit, will give you direction options and (if available) a unit ability
+            
+        
+- UPDATE
+    - In auto mode, every X seconds, run the turn update loop
+    - In chess mode, run the turn loop if both players are ready
+    - Turn update loop:
+        - Any animations are <1/4s and don't actually delay user actions / turn timer
+        - Units battle any adjacent or competing units
+            - Units clash with each other and bump off
+            - Shows damage taken
+        - Units move if able and directed (will continue to move in previously directed direction if no specific action)
+            - Play movement animation (smooth translate?)
+        - Units take damage from any atk ranges they are in
+            - Attack range flashes and unit taking damage has a small damage animation
+            - Shows damage taken
+        - Units damage the enemy player if possible (if on opponent's side of the field, or if atk range extends past the play field)
+            - Attack ranges flash and you can see the health bar tick down, end of field flashes
+            - Shows damage taken
+        - Resource increases by X + Y, X = universal rate, Y = # units in resource fields
+            - No animation
+        
+    - Monitor mouse clicks and run corresponding action depending on user's clicks
