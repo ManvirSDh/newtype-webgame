@@ -140,7 +140,9 @@ try to compile with tinyGo or compress with brotli (serve with https://github.co
 - Cell Object:
     - Is cell a resource area? <Bool>
     - Pointer to unit that is inside. <Unit*>
+    - is in some attack range?
 - Player Object:
+    - Health <int>
     - List of Units: <Unit[]>
     - Resource Count: <int>
     - Commander Type: <String>
