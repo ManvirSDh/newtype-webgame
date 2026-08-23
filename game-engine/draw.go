@@ -9,6 +9,12 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
+func (g *Game) drawUnits(screen *ebiten.Image) {
+	for _, unit := range g.player.units {
+		vector.DrawFilledCircle(screen, unit.X, unit.Y, 20.0, unit.Color, true)
+	}
+}
+
 func (g *Game) Draw(screen *ebiten.Image) {
 	// Background
 	screen.Fill(color.RGBA{R: 18, G: 24, B: 38, A: 255})
@@ -22,12 +28,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		vector.StrokeLine(screen, 0, float32(y), ScreenWidth, float32(y), 1, gridColor, false)
 	}
 
-	// Draw Player Unit
-	vector.DrawFilledCircle(screen, g.playerUnit.X, g.playerUnit.Y, 16, g.playerUnit.Color, false)
-
-	// Draw Time Travel Ghost Unit
-	vector.DrawFilledCircle(screen, g.enemyUnit.X, g.enemyUnit.Y, 12, g.enemyUnit.Color, false)
+	g.drawUnits(screen)
 
 	// Debug / Status Info
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("NEWTYPE 2D ENGINE (GO WASM)\nTurn: %d | Status: %s", g.turn, g.statusMsg))
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("NEWTYPE 2D ENGINE (GO WASM)\nTurn: %d | Status: %s", g.turnNumber, g.statusMsg))
 }
