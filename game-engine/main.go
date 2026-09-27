@@ -2,11 +2,8 @@ package main
 
 import (
 	// "encoding/json"
-
 	"log"
-
 	// "syscall/js"
-
 	"github.com/hajimehoshi/ebiten/v2"
 )
 

@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	GridWidth  = 12
-	GridHeight = 20
+	GridWidth  = 13
+	GridHeight = 13
 )
 
 type Cell struct {
@@ -59,7 +59,7 @@ func (g *Game) Update() error {
 		// g.notifyJSStateChange()
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-		var temp Unit = GenerateUnit()
+		var temp Unit = generateUnit()
 		temp.X = rand.Float32() * 360
 		temp.Y = rand.Float32() * 640
 		temp.Color = color.RGBA{R: uint8(rand.Intn(255)), G: uint8(rand.Intn(255)), B: uint8(rand.Intn(255)), A: uint8(rand.Intn(255))}
