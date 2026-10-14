@@ -194,3 +194,7 @@ try to compile with tinyGo or compress with brotli (serve with https://github.co
             - No animation
         
     - Monitor mouse clicks and run corresponding action depending on user's clicks
+
+
+# resources
+fonts: https://github.com/pixeldroid/fonts

@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	GridWidth  = 13
-	GridHeight = 13
+	GridWidth  = 15
+	GridHeight = 12
 )
 
 type Cell struct {
