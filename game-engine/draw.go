@@ -2,9 +2,9 @@ package main
 
 import (
 	// "fmt"
+	_ "embed"
 	"image/color"
 	"log"
-	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -24,6 +24,9 @@ const (
 	ActionSize       = (ScreenWidth - PortraitSize) / 3
 )
 
+//go:embed pixeldroidConsoleRegular.ttf
+var fontBytes []byte
+
 var (
 	GridColor  = color.RGBA{R: 100, G: 255, B: 120, A: 255}
 	UIColor    = color.RGBA{R: 150, G: 255, B: 150, A: 255}
@@ -32,23 +35,14 @@ var (
 )
 
 func init() {
-	loadUIFont("./pixeldroidConsoleRegular.ttf", TextHeight)
-}
-
-func loadUIFont(path string, size float64) {
-	fontData, err := os.ReadFile(path)
+	tt, err := opentype.Parse(fontBytes)
 	if err != nil {
-		log.Fatalf("Failed to read font file: %v", err)
-	}
-
-	tt, err := opentype.Parse(fontData)
-	if err != nil {
-		log.Fatalf("Failed to parse font: %v", err)
+		log.Fatalf("Failed to parse embedded font: %v", err)
 	}
 
 	const dpi = 72
 	UIFontFace, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    size,
+		Size:    TextHeight,
 		DPI:     dpi,
 		Hinting: font.HintingFull,
 	})
