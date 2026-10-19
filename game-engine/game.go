@@ -11,8 +11,10 @@ import (
 )
 
 const (
-	GridWidth  = 15
-	GridHeight = 12
+	GridWidth           = 15
+	GridHeight          = 12
+	MaxHealth           = 255
+	TurnLengthInSeconds = 5.0
 )
 
 type Cell struct {
@@ -22,32 +24,53 @@ type Cell struct {
 }
 
 type Game struct {
-	player         Player
-	enemy          Player
-	turnNumber     int
-	turnTimer      int
-	timeAtLastTurn time.Time
-	statusMsg      string
-	grid           [GridWidth][GridHeight]Cell
+	player           Player
+	enemy            Player
+	turnNumber       int
+	turnNumberString string
+	timeAtLastTurn   time.Time
+	statusMsg        string
+	grid             [GridWidth][GridHeight]Cell
+	lastTime         time.Time
+	timeAcc          float64
 }
 
 func NewGame() *Game {
 	var grid [GridWidth][GridHeight]Cell
 
 	g := &Game{
-		player:         Player{health: 20, units: []*Unit{}, resources: 3, commander: "test"},
-		enemy:          Player{health: 20, units: []*Unit{}, resources: 3, commander: "test"},
-		turnNumber:     1,
-		turnTimer:      1,
-		timeAtLastTurn: time.Now(),
-		statusMsg:      "Ready - Touch/Click to Move",
-		grid:           grid,
+		player:           Player{health: MaxHealth, units: []*Unit{}, resources: 3, commander: "test"},
+		enemy:            Player{health: MaxHealth, units: []*Unit{}, resources: 3, commander: "test"},
+		turnNumber:       1,
+		turnNumberString: "Turn 1",
+		statusMsg:        "Ready - Touch/Click to Move",
+		grid:             grid,
+		lastTime:         time.Now(),
+		timeAcc:          0.0,
 	}
 	// g.registerJSCallbacks()
 	return g
 }
 
 func (g *Game) Update() error {
+
+	// delta time
+	if g.lastTime.IsZero() {
+		g.lastTime = time.Now()
+		return nil
+	}
+	now := time.Now()
+	dt := now.Sub(g.lastTime).Seconds()
+	g.timeAcc += dt
+	g.lastTime = now
+
+	// TURN TICK
+	if g.timeAcc >= TurnLengthInSeconds {
+		g.timeAcc -= TurnLengthInSeconds
+		g.turnNumber += 1
+		g.turnNumberString = fmt.Sprintf("Turn %d", g.turnNumber)
+	}
+
 	// Handle Touch or Click input
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		cx, cy := ebiten.CursorPosition()

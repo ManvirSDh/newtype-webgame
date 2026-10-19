@@ -28,9 +28,12 @@ const (
 var fontBytes []byte
 
 var (
-	GridColor  = color.RGBA{R: 100, G: 255, B: 120, A: 255}
-	UIColor    = color.RGBA{R: 150, G: 255, B: 150, A: 255}
-	TextColor  = color.RGBA{R: 150, G: 255, B: 150, A: 255}
+	GridColor     = color.RGBA{R: 0, G: 170, B: 0, A: 255}
+	UIColor       = color.RGBA{R: 0, G: 255, B: 0, A: 255}
+	TextColor     = color.RGBA{R: 255, G: 255, B: 255, A: 255}
+	HealthColor   = color.RGBA{R: 255, G: 100, B: 100, A: 255}
+	ResourceColor = color.RGBA{R: 100, G: 100, B: 255, A: 255}
+
 	UIFontFace font.Face
 )
 
@@ -74,39 +77,46 @@ func (g *Game) drawUI(screen *ebiten.Image) {
 	vector.StrokeLine(screen, 0, ySpace, ScreenWidth, ySpace, uiStrokeWidth, UIColor, false)
 	vector.StrokeLine(screen, 0, ScreenHeight-ySpace, ScreenWidth, ScreenHeight-ySpace, uiStrokeWidth, UIColor, false)
 
-	// write player / commander names
-	// draw resource count
+	// TURN NUMBER
+	text.Draw(screen, g.turnNumberString, UIFontFace, 16, int(ySpace+16), TextColor)
 
-	// space on left for portrait
+	// PORTRAIT
 	vector.StrokeLine(screen, PortraitSize, 0, PortraitSize, ySpace, uiStrokeWidth, UIColor, false)
 	vector.StrokeLine(screen, PortraitSize, ScreenHeight-ySpace, PortraitSize, ScreenHeight, uiStrokeWidth, UIColor, false)
 	text.Draw(screen, "COMMAND\nPORTRAIT", UIFontFace, 0, TextHeight*0.75, TextColor)
 	text.Draw(screen, "COMMAND\nPORTRAIT", UIFontFace, 0, int(ScreenHeight-ySpace+TextHeight*0.75), TextColor)
+	// TODO: Read portraits from file and actually display
+	// get commander name and then display corresponding image
 
-	// seperators for health / resource bars
+	// HEALTH BARS
+	// separators for health / resource bars
 	vector.StrokeLine(screen, PortraitSize, ResourceIconSize, ScreenWidth, ResourceIconSize, uiStrokeWidth, UIColor, false)
 	vector.StrokeLine(screen, PortraitSize, ScreenHeight-ySpace+ResourceIconSize, ScreenWidth, ScreenHeight-ySpace+ResourceIconSize, uiStrokeWidth, UIColor, false)
 	text.Draw(screen, "HEALTH BAR", UIFontFace, PortraitSize+5, TextHeight*0.75, TextColor)
 	text.Draw(screen, "HEALTH BAR", UIFontFace, PortraitSize+5, int(ScreenHeight-ySpace+TextHeight*0.75), TextColor)
+	// TODO: Draw health bar
+	// TODO: print health numbers
 
 	spaceForHealthBar := ScreenWidth - PortraitSize - ResourceBarSize - ResourceIconSize
 	startOfResourceBar := float32(PortraitSize + spaceForHealthBar)
 
+	// RES BARS
 	vector.StrokeLine(screen, startOfResourceBar, 0, startOfResourceBar, TextHeight, uiStrokeWidth, UIColor, false)
 	vector.StrokeLine(screen, startOfResourceBar, ScreenHeight-ySpace+(TextHeight), startOfResourceBar, ScreenHeight-ySpace, uiStrokeWidth, UIColor, false)
 	text.Draw(screen, "RES. BAR", UIFontFace, int(startOfResourceBar), TextHeight*0.75, TextColor)
 	text.Draw(screen, "RES. BAR", UIFontFace, int(startOfResourceBar), int(ScreenHeight-ySpace+TextHeight*0.75), TextColor)
+	// TODO: draw res bar and draw res number
 
-	// draw possible actions
+	// POSSIBLE ACTIONS
 	vector.StrokeLine(screen, PortraitSize+ActionSize, TextHeight, PortraitSize+ActionSize, ySpace, uiStrokeWidth, UIColor, false)
 	vector.StrokeLine(screen, PortraitSize+(2*ActionSize), TextHeight, PortraitSize+(2*ActionSize), ySpace, uiStrokeWidth, UIColor, false)
 	vector.StrokeLine(screen, PortraitSize+ActionSize, ScreenHeight-ySpace+TextHeight, PortraitSize+ActionSize, ScreenHeight, uiStrokeWidth, UIColor, false)
 	vector.StrokeLine(screen, PortraitSize+(2*ActionSize), ScreenHeight-ySpace+TextHeight, PortraitSize+(2*ActionSize), ScreenHeight, uiStrokeWidth, UIColor, false)
+
 	text.Draw(screen, "ACT 1", UIFontFace, PortraitSize, TextHeight*01.75, TextColor)
 	text.Draw(screen, "ACT 1", UIFontFace, PortraitSize, int(ScreenHeight-ySpace+TextHeight*1.75), TextColor)
 	text.Draw(screen, "ACT 2", UIFontFace, PortraitSize+ActionSize, TextHeight*1.75, TextColor)
 	text.Draw(screen, "ACT 2", UIFontFace, PortraitSize+ActionSize, int(ScreenHeight-ySpace+TextHeight*1.75), TextColor)
-
 	text.Draw(screen, "ACT 3", UIFontFace, PortraitSize+2*ActionSize, TextHeight*1.75, TextColor)
 	text.Draw(screen, "ACT 3", UIFontFace, PortraitSize+2*ActionSize, int(ScreenHeight-ySpace+TextHeight*1.75), TextColor)
 }
